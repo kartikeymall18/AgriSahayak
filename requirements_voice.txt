@@ -1,0 +1,5 @@
+# pip install -r requirements_voice.txt   (after install_cuda_torch.py)
+soundfile
+sentencepiece
+librosa
+huggingface_hub

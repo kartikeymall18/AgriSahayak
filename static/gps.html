@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AgriSahayak - Phone GPS</title>
+<link rel="stylesheet" href="/css/theme.css">
+<style> body { padding: 18px; max-width: 520px; margin: 0 auto; overflow: auto; height: auto; } h1 { font-size: 20px; } p { color: var(--text-3); font-size: 13px; margin: 6px 0 14px; }
+ .big { font-size: 26px; font-weight: 800; margin: 12px 0 4px; } .box { padding: 14px; border-radius: 14px; border: 1px solid var(--line-2); background: var(--surface-2); margin-bottom: 12px; font-size: 13px; } .bad { color: var(--red); } </style></head>
+<body>
+<h1>Phone GPS for AgriSahayak</h1>
+<p>Use this when the tablet has no GPS. Keep this phone next to the rover and this page open. Every photo then gets this phone's position. The position is never spoken aloud.</p>
+<div class="box" id="env"></div>
+<button class="btn primary" id="go" style="width:100%;height:48px;font-size:16px">Start sending my location</button>
+<div class="box" style="margin-top:14px"><div class="big" id="st">Not started</div><div id="sub" class="dim"></div></div>
+<script>
+const $ = id => document.getElementById(id);
+$('env').innerHTML = 'Secure page (needed for location): <b>' + (window.isSecureContext ? 'YES' : 'NO') + '</b>' + (window.isSecureContext ? '' : '<br><span class="bad">Open chrome://flags/#unsafely-treat-insecure-origin-as-secure, add ' + location.origin + ', set Enabled, relaunch Chrome, and open this page again.</span>');
+let sent = 0;
+$('go').onclick = () => {
+  if (!navigator.geolocation) { $('st').textContent = 'No GPS in this browser'; return; }
+  $('st').textContent = 'Waiting for a fix...';
+  navigator.geolocation.watchPosition(async p => {
+    const acc = Math.round(p.coords.accuracy);
+    $('st').textContent = 'Sending, about ' + acc + ' m';
+    $('sub').textContent = acc <= 30 ? 'Good GPS fix.' : 'Rough fix. Go outside or wait a little.';
+    try { await fetch('/api/gps', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ src: 'phone', lat: p.coords.latitude, lon: p.coords.longitude, acc: p.coords.accuracy }) }); sent++; $('sub').textContent += ' Sent ' + sent + ' times.'; } catch (e) { $('sub').textContent = 'Cannot reach the laptop.'; }
+  }, e => { $('st').textContent = e.code === 1 ? 'Location permission blocked' : 'No position yet'; }, { enableHighAccuracy: true, maximumAge: 2000, timeout: 30000 });
+};
+</script></body></html>

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="360" viewBox="0 0 1400 360" role="img" aria-labelledby="title desc">
+  <title id="title">AgriSahayak — Smart Crop Assistant</title>
+  <desc id="desc">A field support rover connecting crop screening, farmer guidance, and a laptop and tablet dashboard.</desc>
+  <defs>
+    <linearGradient id="field" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#e8eee9"/>
+      <stop offset=".52" stop-color="#c9d8ce"/>
+      <stop offset="1" stop-color="#a9c4ae"/>
+    </linearGradient>
+    <linearGradient id="wave" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#717c78"/>
+      <stop offset=".52" stop-color="#475550"/>
+      <stop offset="1" stop-color="#727d78"/>
+    </linearGradient>
+  </defs>
+  <rect width="1400" height="360" fill="#101513"/>
+  <path d="M40 0H1360V300Q1040 276 700 302T40 300Z" fill="url(#field)"/>
+  <path d="M40 300Q365 269 700 302T1360 290V327Q1065 349 700 322T40 330Z" fill="url(#wave)"/>
+  <path d="M40 330Q372 308 700 322T1360 326V360H40Z" fill="#101513"/>
+  <g fill="#18412d" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif">
+    <text x="700" y="132" font-size="62" font-weight="700" letter-spacing="-1.5">AgriSahayak</text>
+    <text x="700" y="177" font-size="22" font-weight="600">SMART CROP ASSISTANT · FIELD ROVER · FARMER SUPPORT</text>
+    <text x="700" y="215" font-size="17" fill="#325d42">Leaf screening  |  Produce detection  |  Offline capture  |  Multilingual guidance</text>
+  </g>
+  <g fill="#3d664b" font-family="Segoe UI,Arial,sans-serif" font-size="13" font-weight="600" letter-spacing="2">
+    <text x="74" y="282">FIELD INTELLIGENCE</text>
+    <text x="1326" y="282" text-anchor="end">LAPTOP + TABLET</text>
+  </g>
+</svg>

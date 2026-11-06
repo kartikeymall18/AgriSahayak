@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AgriSahayak - USB test</title>
+<link rel="stylesheet" href="/css/theme.css">
+<style>
+ body { padding: 16px; max-width: 760px; margin: 0 auto; overflow: auto; height: auto; }
+ h1 { font-size: 20px; margin-bottom: 4px; } p.s { color: var(--text-3); font-size: 13px; margin-bottom: 14px; }
+ .row { display: flex; gap: 10px; flex-wrap: wrap; margin: 12px 0; } .row .input { flex: 1; min-width: 160px; }
+ #log { background: #050a09; border: 1px solid var(--line-2); border-radius: 12px; padding: 12px; font-family: var(--mono); font-size: 12.5px; height: 46vh; overflow: auto; white-space: pre-wrap; }
+ .ok { color: var(--brand); } .bad { color: var(--red); } .dim { color: var(--text-3); } .box { padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line-2); background: var(--surface-2); margin-bottom: 12px; font-size: 13px; }
+</style></head>
+<body>
+<h1>USB test: tablet to Arduino (inside Chrome)</h1>
+<p class="s">Checks if this tablet's Chrome can talk to the Uno over USB-OTG. No app install needed.</p>
+<div class="box" id="env">Checking...</div>
+<div class="row"><button class="btn primary" id="go">1. Connect Arduino</button><button class="btn" id="dis" disabled>Disconnect</button></div>
+<div class="row"><input class="input" id="txt" placeholder="Type a command: F  B  L  R  S  V150  C" value="C"><button class="btn" id="send" disabled>Send</button></div>
+<div id="log"></div>
+<script src="/js/usbserial.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const L = (t, c) => { const d = document.createElement('div'); if (c) d.className = c; d.textContent = t; $('log').appendChild(d); $('log').scrollTop = 1e9; };
+let port = null;
+(function env() {
+  const v = (navigator.userAgent.match(/Chrome\/(\d+)/) || [])[1];
+  let t = 'Chrome version: ' + (v || '?') + '<br>Secure page (needed for USB): <b>' + (window.isSecureContext ? 'YES' : 'NO') + '</b><br>WebUSB available: <b>' + (navigator.usb ? 'YES' : 'NO') + '</b>';
+  if (!navigator.usb) t += '<br><span class="bad">WebUSB is blocked on this address. Open chrome://flags/#unsafely-treat-insecure-origin-as-secure, add ' + location.origin + ', set Enabled, then Relaunch Chrome.</span>';
+  $('env').innerHTML = t;
+})();
+$('go').onclick = async () => {
+  let dev; try { dev = await UsbSerial.request(); } catch (e) { L('No device chosen: ' + e.message, 'bad'); return; }
+  L('Device ' + (dev.productName || '?') + '   Vendor ID 0x' + dev.vendorId.toString(16) + '  Product ID 0x' + dev.productId.toString(16), 'ok');
+  try {
+    port = await UsbSerial.open(dev, { baud: 9600, onLine: l => L('< ' + l), log: t => L('  ' + t, 'dim'), onClose: e => L('Closed: ' + e.message, 'bad') });
+    L('Connected as ' + port.kind + '. Wait 3 seconds for data...', 'ok'); $('dis').disabled = false; $('send').disabled = false;
+  } catch (e) { L('Failed: ' + e.name + ' - ' + e.message, 'bad'); L('Tell me this line and the Vendor ID above.', 'dim'); }
+};
+$('send').onclick = async () => { if (!port) return; try { await port.write($('txt').value.trim() + '\n'); L('> ' + $('txt').value.trim(), 'dim'); } catch (e) { L('Send failed: ' + e.message, 'bad'); } };
+$('dis').onclick = async () => { if (port) await port.close(); L('Disconnected.', 'dim'); $('dis').disabled = true; $('send').disabled = true; };
+</script></body></html>

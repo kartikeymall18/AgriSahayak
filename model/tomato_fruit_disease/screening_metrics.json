@@ -1,0 +1,39 @@
+{
+  "source_dataset": "TCP (Tomato-Chilli-Papaya Fruit & Leaf) Disease Dataset, Mendeley Data, v4",
+  "source_url": "https://data.mendeley.com/datasets/m4m6j2tjfj/4",
+  "license": "CC BY 4.0; attribution required",
+  "classes": {
+    "0": "Healthy tomato fruit",
+    "1": "Possible diseased tomato fruit"
+  },
+  "binary_scope": "healthy tomato fruit vs possible diseased tomato fruit; no specific disease name",
+  "split_sizes": {
+    "train": 372,
+    "val": 79,
+    "test": 79
+  },
+  "held_out_test": {
+    "healthy": {
+      "precision": 0.8846,
+      "recall": 0.9583,
+      "f1": 0.92
+    },
+    "possible_disease": {
+      "precision": 0.9259,
+      "recall": 0.8065,
+      "f1": 0.8621
+    },
+    "accuracy": 0.8987,
+    "macro_f1": 0.891,
+    "balanced_accuracy": 0.8824
+  },
+  "confidence_threshold": 0.68,
+  "caveat": "Small source dataset and prototype validation. Field images may differ; low-confidence outputs must be marked uncertain and confirmed by a plant-health professional.",
+  "dataset_authors": [
+    "Anand Kumar Jain",
+    "Neeta Nain",
+    "Anadi Jain"
+  ],
+  "related_paper": "https://doi.org/10.21203/rs.3.rs-8819059/v1",
+  "base_model": "Existing AgriSahayak classifier weights from linkanjarad/mobilenet_v2_1.0_224-plant-disease-identification"
+}

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>AgriSahayak - Rover Control</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; color: #000; background: #fff; }
+  .wrap { display: flex; height: 100vh; }
+  .left { flex: 3; padding: 12px; display: flex; flex-direction: column; }
+  .right { flex: 1.3; min-width: 300px; padding: 12px; border-left: 2px solid #000; }
+  #feed { width: 100%; flex: 1; object-fit: contain; border: 2px solid #000; background: #eee; min-height: 0; }
+  #nofeed { margin-top: 6px; font-size: 14px; }
+  .pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0; }
+  .pad button { font-size: 26px; padding: 22px 0; border: 2px solid #000; background: #fff; touch-action: none; user-select: none; }
+  .pad button:active { background: #ccc; }
+  #stop { grid-column: 2; font-size: 20px; font-weight: bold; }
+  .info { border: 1px solid #000; padding: 8px; font-size: 14px; margin-top: 10px; }
+  input[type=range] { width: 100%; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="left">
+    <b>Rover camera (tablet preview)</b>
+    <img id="feed" alt="">
+    <div id="nofeed">No preview yet. On the tablet, tick "Show live preview on laptop dashboard".</div>
+  </div>
+  <div class="right">
+    <b>Controls</b>
+    <div class="pad">
+      <span></span><button id="bF">&#9650;</button><span></span>
+      <button id="bL">&#9664;</button><button id="stop">STOP</button><button id="bR">&#9654;</button>
+      <span></span><button id="bB">&#9660;</button><span></span>
+    </div>
+    <div>Speed: <b id="spv">150</b> (0-255)<input type="range" id="speed" min="0" max="255" value="150"
+      oninput="document.getElementById('spv').textContent=this.value"></div>
+    <div class="info">Hold a button to move. Let go to stop.<br>Keyboard: W A S D or arrow keys, Space = STOP.</div>
+    <div class="info" id="st">Status: ...</div>
+  </div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+let holdTimer = null, cur = 'S';
+function send(cmd) {
+  fetch('/api/rover', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ cmd, speed: +$('speed').value }) }).catch(() => {});
+}
+function hold(cmd) { release(true); cur = cmd; send(cmd); holdTimer = setInterval(() => send(cmd), 150); }
+function release(quiet) {
+  if (holdTimer) { clearInterval(holdTimer); holdTimer = null; }
+  if (!quiet && cur !== 'S') { cur = 'S'; send('S'); }
+  if (quiet) cur = 'S';
+}
+const map = { bF: 'F', bB: 'B', bL: 'L', bR: 'R' };
+Object.keys(map).forEach(id => {
+  const b = $(id);
+  b.addEventListener('pointerdown', e => { e.preventDefault(); hold(map[id]); });
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => b.addEventListener(ev, () => release()));
+});
+$('stop').addEventListener('click', () => { release(true); send('S'); });
+const keys = { w: 'F', arrowup: 'F', s: 'B', arrowdown: 'B', a: 'L', arrowleft: 'L', d: 'R', arrowright: 'R' };
+let keyDown = null;
+document.addEventListener('keydown', e => {
+  const k = e.key.toLowerCase();
+  if (k === ' ') { e.preventDefault(); keyDown = null; release(true); send('S'); return; }
+  if (keys[k] && !e.repeat) { e.preventDefault(); keyDown = k; hold(keys[k]); }
+});
+document.addEventListener('keyup', e => { if (e.key.toLowerCase() === keyDown) { keyDown = null; release(); } });
+window.addEventListener('blur', () => release());
+window.addEventListener('beforeunload', () => send('S'));
+
+const img = $('feed');
+function next() { img.src = '/api/latest.jpg?t=' + Date.now(); }
+img.onload = () => { $('nofeed').style.display = 'none'; setTimeout(next, 200); };
+img.onerror = () => { $('nofeed').style.display = 'block'; setTimeout(next, 1000); };
+next();
+setInterval(async () => {
+  try {
+    const s = await (await fetch('/api/status')).json();
+    $('st').textContent = 'Rover: ' + s.rover + ' | last command: ' + s.last_cmd + (s.rover_error ? ' | error: ' + s.rover_error : '');
+  } catch (e) { $('st').textContent = 'Status: cannot reach server'; }
+}, 1000);
+</script>
+</body>
+</html>

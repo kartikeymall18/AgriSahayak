@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AgriSahayak - Control Center</title>
+<link rel="stylesheet" href="/css/theme.css">
+<link rel="stylesheet" href="/css/dashboard.css?v=20261103c">
+<link rel="stylesheet" href="/css/dashboard-refresh.css?v=20261106a">
+</head>
+<body>
+<div class="app">
+
+  <aside class="side">
+    <div class="brand">
+      <div class="logo" data-i="leaf"></div>
+      <div><b>AgriSahayak</b><small>Smart Crop Assistant</small></div>
+      <div class="brand-more">
+        <button class="btn sm ghost more-trigger" id="moreTrigger" type="button" aria-label="Open menu" aria-haspopup="true" aria-expanded="false">⋯</button>
+        <div class="brand-menu" id="brandMenu" hidden>
+          <button type="button" id="settingsOpen">Settings</button>
+        </div>
+      </div>
+    </div>
+    <div class="nav-label">Workspace</div>
+    <nav>
+      <a href="#/overview" data-page="overview" data-i="grid"><span>Overview</span></a>
+      <a href="#/live" data-page="live" data-i="video"><span>Live Monitor</span><em class="pill-live" id="navLive">LIVE</em></a>
+      <a href="#/rover" data-page="rover" data-i="cpu"><span>Rover Tools</span></a>
+      <a href="#/support" data-page="support" data-i="activity"><span>Farmer Support Desk</span></a>
+      <a href="#/records" data-page="records" data-i="list"><span>Records</span><em class="count" id="navCount">0</em></a>
+    </nav>
+    <div class="side-foot">
+      <div class="nav-label">System</div>
+      <div class="sys"><span class="dot" id="dModel"></span><span>Disease model</span><b id="tModel">-</b></div>
+      <div class="sys"><span class="dot" id="dTab"></span><span>Tablet camera</span><b id="tTab">-</b></div>
+      <div class="sys"><span class="dot" id="dRover"></span><span>Rover link</span><b id="tRover">-</b></div>
+      <div class="offline" id="offline">Server unreachable</div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="top">
+      <div class="titles"><h1 id="title">Overview</h1><p id="sub"></p></div>
+      <div class="actions">
+        <span class="clock mono" id="clock"></span>
+        <select class="input lang" id="lang" title="Reply language"><option value="en">English</option><option value="hi">हिन्दी</option><option value="bho">भोजपुरी (draft)</option><option value="mai">मैथिली (draft)</option></select>
+        <button class="btn" id="btnSummary" data-i="volume"><span>Speak summary</span></button>
+        <button class="btn primary" id="btnCsv" data-i="download"><span>Export CSV</span></button>
+      </div>
+    </header>
+
+    <main class="pages" id="pages">
+
+      <!-- ============ OVERVIEW ============ -->
+      <section class="page" id="page-overview">
+        <div class="kpis">
+          <div class="card kpi"><div class="kico" data-i="image"></div><div class="klabel">Total scans</div><div class="kval" id="kTotal">0</div><div class="ksub" id="kTotalSub">photos and clips</div></div>
+          <div class="card kpi good"><div class="kico" data-i="check"></div><div class="klabel">Healthy</div><div class="kval" id="kHealthy">0</div><div class="ksub" id="kHealthySub">of confident results</div></div>
+          <div class="card kpi bad"><div class="kico" data-i="alert"></div><div class="klabel">Disease detected</div><div class="kval" id="kDis">0</div><div class="ksub" id="kDisSub">fungal, bacterial, viral, pest</div></div>
+          <div class="card kpi info"><div class="kico" data-i="activity"></div><div class="klabel">Needs review</div><div class="kval" id="kRev">0</div><div class="ksub">low confidence results</div></div>
+          <div class="card kpi info"><div class="kico" data-i="image"></div><div class="klabel">Produce estimate</div><div class="kval" id="kProduce">0</div><div class="ksub">estimated objects in saved scans</div></div>
+        </div>
+
+        <div class="grid">
+          <div class="card span5" id="cLatest"></div>
+          <div class="card span4"><h3>Diagnosis mix</h3><div id="cMix"></div></div>
+          <div class="card span3"><h3>System health</h3><div id="cHealth"></div></div>
+          <div class="card span5"><h3>Confidence of recent scans</h3><div id="cBars"></div></div>
+          <div class="card span7"><h3><span class="grow">Recent activity</span><a class="link" href="#/records">View all</a></h3><div id="cRecent"></div></div>
+          <div class="card span12"><h3><span class="grow">Scan locations</span><span class="dim" id="mapNote" style="text-transform:none;letter-spacing:0"></span></h3><div id="cMap"></div></div>
+        </div>
+      </section>
+
+      <!-- ============ LIVE ============ -->
+      <section class="page" id="page-live">
+        <div class="live-grid">
+          <div class="feed card" id="feed">
+            <img id="feedImg" alt="">
+            <svg id="bboxLayer" class="bbox-layer" aria-hidden="true" preserveAspectRatio="xMidYMid meet"></svg>
+            <div class="reticle"></div>
+            <div class="hud tl"><span class="rec"><i class="dot bad pulse"></i> LIVE</span><span class="hudtxt mono" id="hudRes">-</span></div>
+            <div class="hud tr"><span class="hudtxt mono" id="hudAge">-</span></div>
+            <div class="hud bl" id="hudRead"></div>
+            <button class="btn sm hud br" id="btnFull" data-i="expand"><span>Fullscreen</span></button>
+            <div class="nofeed" id="noFeed">
+              <div class="radar"><i></i></div>
+              <b>Waiting for the tablet camera</b>
+              <span>On the tablet open the AgriSahayak page and tap <em>Start camera</em>.</span>
+            </div>
+          </div>
+
+          <div class="rail">
+            <div class="card slim" id="rRead"></div>
+            <div class="card slim" id="cRemote">
+              <h3>Tablet remote <span class="grow"></span><span class="chip" id="tabChip">-</span></h3>
+              <div class="tchips" id="tabStatus"></div>
+              <div class="rbtns">
+                <button class="btn sm" id="tCamOn">Start camera</button><button class="btn sm" id="tCamOff">Stop camera</button>
+                <button class="btn sm primary" id="tPhoto" data-i="camera"><span>Take photo</span></button><button class="btn sm" id="tClip">5 s clip</button>
+              </div>
+              <button class="btn sm" id="gpsLaptop" data-i="pin" style="width:100%;margin-bottom:9px"><span>Use this laptop's location</span></button>
+              <label class="switch auto"><input type="checkbox" id="tAuto"> Auto-capture every <input class="input tint" id="tInt" type="number" value="120" min="15" max="3600"> s</label>
+              <label class="fld">Field name (set once)
+                <div class="inline"><input class="input" id="fieldName" placeholder="Demo Field"><button class="btn sm" id="fieldSave">Save</button></div></label>
+            </div>
+            <div class="card slim" id="rSoil"></div>
+            <div class="card slim">
+              <h3>Rover control <span class="grow"></span><span class="chip" id="rMode">-</span></h3>
+              <div class="pad">
+                <span></span><button class="pb" id="bF" data-i="up"></button><span></span>
+                <button class="pb" id="bL" data-i="left"></button><button class="pb stop" id="bS" data-i="stop"></button><button class="pb" id="bR" data-i="right"></button>
+                <span></span><button class="pb" id="bB" data-i="down"></button><span></span>
+              </div>
+              <div class="rbtns" style="margin-bottom:10px"><button class="btn sm" id="nF">Nudge forward</button><button class="btn sm" id="nB">Nudge back</button></div>
+              <label class="fld"><span style="display:flex;justify-content:space-between">Speed <b id="spv" class="mono" style="color:var(--text)">150</b></span>
+                <input type="range" id="speed" min="0" max="255" value="150"></label>
+              <p class="hint">Hold a button or use <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / arrows. <kbd>Space</kbd> = stop. Rover stops by itself if the link drops.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ ROVER TOOLS ============ -->
+      <section class="page" id="page-rover">
+        <div class="banner" id="rvBanner">Arduino not linked. Plug it into the tablet and open the tablet page.</div>
+        <div class="tiles">
+          <div class="tile"><span class="tl">Temperature</span><b class="tv" id="vTemp">-</b></div>
+          <div class="tile"><span class="tl">Air humidity</span><b class="tv" id="vHum">-</b></div>
+          <div class="tile"><span class="tl">Soil moisture</span><b class="tv" id="vSoil">-</b></div>
+          <div class="tile"><span class="tl">Front distance</span><b class="tv" id="vDist">-</b></div>
+          <div class="tile"><span class="tl">Table edge</span><b class="tv" id="vEdge">-</b></div>
+          <div class="tile"><span class="tl">Pump</span><b class="tv" id="vPump">-</b></div>
+          <div class="tile"><span class="tl">Servo angle</span><b class="tv" id="vServo">-</b></div>
+        </div>
+        <div class="grid" style="margin-top:16px">
+          <div class="card span7">
+            <h3><span class="grow">Front scan (ultrasonic sensor on the servo)</span><button class="btn sm primary" id="rvScan" data-i="activity"><span>Scan now</span></button></h3>
+            <div id="scanViz"></div>
+            <p class="dim" style="font-size:12px;margin-top:10px">Scan works only while the rover stands still. It looks left, centre and right, then returns to the centre.</p>
+          </div>
+          <div class="card span5">
+            <h3>Tools</h3>
+            <div class="rbtns"><button class="btn sm" id="pump3">Pump 3 s</button><button class="btn sm" id="pump5">Pump 5 s</button><button class="btn sm" id="pumpOff">Pump off</button><button class="btn sm" id="servoC">Servo centre</button></div>
+            <label class="fld" style="margin-bottom:12px"><span style="display:flex;justify-content:space-between">Servo angle <b id="svv" class="mono" style="color:var(--text)">90</b></span><input type="range" id="servoR" min="0" max="180" value="90"></label>
+            <label class="switch" style="margin-bottom:10px"><input type="checkbox" id="swAuto"> Automatic watering when the soil stays dry</label>
+            <label class="switch" style="margin-bottom:12px"><input type="checkbox" id="swSafe" checked> Safety: stop at obstacles and table edge</label>
+            <div class="rbtns"><button class="btn sm" id="calAir">Calibrate: sensor in dry air</button><button class="btn sm" id="calWater">Calibrate: sensor in water</button></div>
+            <button class="btn danger" id="stopAll" style="width:100%;margin-top:6px">EMERGENCY STOP (motors, pump)</button>
+            <p class="dim" style="font-size:11px;margin-top:10px" id="rvMsg"></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ FARMER SUPPORT ============ -->
+      <section class="page" id="page-support">
+        <div class="grid">
+          <div class="card span7">
+            <h3>Find farmer support</h3>
+            <p class="dim" style="margin:8px 0 16px;line-height:1.6">Fasal Saathi ranks official scheme and expert-support routes using your crop, location, farming status, request, and latest scan. It prepares a call note for you; it does not submit an application.</p>
+            <div style="padding:12px;border:1px solid var(--line-2);border-radius:12px;margin-bottom:14px;background:var(--surface)">
+              <b>Demonstration farm profile</b>
+              <p class="dim" style="font-size:12px;margin:4px 0 10px">Loads clearly marked sample details for a tomato field. Replace them with real details before using the recommendations for a real farmer.</p>
+              <button class="btn sm" id="loadDemoProfile" type="button">Load tomato demo and find support</button>
+            </div>
+            <label class="fld">Crop or activity<input class="input" id="supportCrop" maxlength="60" placeholder="For example: potato, tomato, wheat"></label>
+            <label class="fld" style="margin-top:12px">District and state<input class="input" id="supportDistrict" maxlength="80" placeholder="For example: district, state"></label>
+            <label class="fld" style="margin-top:12px">Field survey notes<input class="input" id="supportField" maxlength="500" placeholder="Area, irrigation, crop stage, soil type (optional)"></label>
+            <label class="fld" style="margin-top:12px">Cultivator status
+              <select class="input" id="supportCultivator"><option value="">Not sure / not provided</option><option value="owner cultivator">Owner cultivator</option><option value="tenant farmer">Tenant farmer</option><option value="sharecropper">Sharecropper</option><option value="farmer group">Farmer group / SHG / JLG</option></select>
+            </label>
+            <label class="fld" style="margin-top:12px">What help is needed?<textarea class="input" id="supportIssue" maxlength="500" rows="4" placeholder="Describe the crop problem, crop loss, loan or scheme question, or request for a field visit."></textarea></label>
+            <div class="row" style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap"><button class="btn primary" id="supportBuild">Find best-fit support</button><button class="btn" id="supportCopy" disabled>Copy call note</button></div>
+            <div class="advbox" id="supportDraft" style="margin-top:14px">Add crop, district/state, and the kind of help needed to get a ranked shortlist.</div>
+          </div>
+          <div class="card span5">
+            <h3>Government agriculture support</h3>
+            <p style="margin:12px 0 6px"><b>Kisan Call Centre</b></p>
+            <p class="dim" style="line-height:1.6">Call <b>1800-180-1551</b> for agriculture and allied-sector questions. Ask for help in your preferred language and request referral to the relevant state agriculture specialist if needed.</p>
+            <a class="btn primary" style="margin-top:12px" href="tel:18001801551">Call Kisan Call Centre</a>
+            <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
+            <p style="margin:0 0 8px"><b>Official scheme portals</b></p>
+            <p style="margin:8px 0"><a class="link" href="https://pmkisan.gov.in/" target="_blank" rel="noopener">PM-KISAN status and helpdesk</a></p>
+            <p style="margin:8px 0"><a class="link" href="https://pmfby.gov.in/" target="_blank" rel="noopener">PM Fasal Bima Yojana and crop-loss support</a></p>
+            <p style="margin:8px 0"><a class="link" href="https://financialservices.gov.in/agriculture-credit" target="_blank" rel="noopener">Kisan Credit Card (KCC) information</a></p>
+            <p class="dim" style="font-size:11px;line-height:1.6;margin-top:14px">Scheme access, eligibility, loan terms, and benefit amounts depend on current rules and location. Confirm them with the official department or bank; this prototype does not promise eligibility or send applications.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ RECORDS ============ -->
+      <section class="page" id="page-records">
+        <div class="toolbar">
+          <div class="search" data-i="search"><input class="input" id="q" placeholder="Search crop, field, plot, diagnosis"></div>
+          <div class="seg" id="segCat"></div>
+          <select class="input" id="fCrop" style="width:170px"></select>
+        </div>
+        <div class="card flush"><div id="tblWrap"></div></div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<dialog class="prefs-dialog" id="prefsDialog" aria-labelledby="prefsTitle">
+  <form method="dialog" class="prefs-card">
+    <div class="prefs-head"><div><h2 id="prefsTitle">Settings</h2><p>Choose the language for the spoken project introduction.</p></div><button class="btn sm ghost" value="cancel" aria-label="Close">×</button></div>
+    <label class="fld" for="introLang">Introduction language
+      <select class="input" id="introLang">
+        <option value="hi">हिन्दी (default)</option>
+        <option value="en">English</option>
+        <option value="bho">भोजपुरी (draft)</option>
+        <option value="mai">मैथिली (draft)</option>
+      </select>
+    </label>
+    <p class="prefs-note">The assistant still detects the language of each question automatically.</p>
+    <div class="prefs-actions"><button class="btn" value="cancel">Cancel</button><button class="btn primary" id="prefsSave" value="save">Save settings</button></div>
+  </form>
+</dialog>
+
+<div class="backdrop" id="backdrop"></div>
+<aside class="drawer" id="drawer"></aside>
+<div class="toast-wrap" id="toasts"></div>
+
+<button class="fab" id="fab" data-i="mic"><span>Fasal Saathi</span></button>
+<section class="chat" id="chat" aria-label="Fasal Saathi assistant">
+  <div class="chat-h">
+    <div class="av" data-i="leaf"></div>
+    <div class="ht"><b>Fasal Saathi</b><small>Ask about your field</small></div>
+    <button class="btn sm chat-intro" id="chatIntro" type="button">Introduction</button>
+    <button class="btn sm ghost" id="chatX" data-i="x"></button>
+  </div>
+  <div class="chat-b" id="chatBody"></div>
+  <div class="tchips" id="chatChips"></div>
+  <div class="chat-o">
+    <label class="chat-reply-lang" for="chatReplyLang">Reply language
+      <select class="input" id="chatReplyLang" aria-label="Fasal Saathi reply language">
+        <option value="hi">हिन्दी</option><option value="en">English</option>
+        <option value="bho">भोजपुरी</option><option value="mai">मैथिली</option>
+      </select>
+    </label>
+    <label class="switch"><input type="checkbox" id="optVoice" checked> Voice reply</label>
+    <label class="switch"><input type="checkbox" id="optTab"> Also on tablet</label>
+    <label class="switch"><input type="checkbox" id="optCall"> Call mode</label>
+  </div>
+  <div class="chat-n" id="chatNote">Answers come only from your saved scans and sensors.</div>
+  <div class="chat-f">
+    <button class="btn" id="micBtn" data-i="mic" title="Speak"></button>
+    <input class="input" id="chatIn" placeholder="Ask Fasal Saathi..." autocomplete="off">
+    <button class="btn primary" id="chatSend" data-i="send"></button>
+  </div>
+</section>
+
+<script src="/js/common.js?v=20261103e"></script>
+<script src="/js/voicecap.js"></script>
+<script src="/js/dashboard.js?v=20261106a"></script>
+</body>
+</html>

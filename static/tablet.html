@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#08100e">
+<title>AgriSahayak - Rover Camera</title>
+<link rel="stylesheet" href="/css/theme.css">
+<link rel="stylesheet" href="/css/tablet.css?v=20261103e">
+</head>
+<body>
+<div class="shell">
+
+  <!-- ================= CAMERA STAGE (the hero) ================= -->
+  <main class="stage" id="stage">
+    <video id="v" autoplay playsinline muted></video>
+    <svg id="bboxLayer" class="bbox-layer" aria-hidden="true" preserveAspectRatio="xMidYMid slice"></svg>
+    <div class="vignette"></div>
+    <div class="reticle"></div>
+
+    <div class="hud tl">
+      <span class="pill brandpill" data-i="leaf"><b>AgriSahayak</b></span>
+      <span class="pill" id="recPill"><i class="dot" id="recDot"></i><span id="recTxt">Camera off</span></span>
+    </div>
+    <div class="hud tr">
+      <span class="pill" id="connPill"><i class="dot" id="connDot"></i><span id="conn">Checking...</span></span>
+      <button class="pill fullscreen" id="btnFullscreen" type="button" title="Full screen" aria-label="Enter full screen">⛶ Full screen</button>
+    </div>
+    <div class="hiddenmsg" id="hiddenMsg"><b>Preview hidden on this screen</b><span>The camera is still working and streaming to the laptop.</span></div>
+
+    <div class="start" id="startBox">
+      <div class="startcard">
+        <div class="bigleaf" data-i="camera"></div>
+        <b>Rover camera is off</b>
+        <span>The laptop can start it. Or tap here and allow the camera.</span>
+        <button class="btn primary lg" id="btnStart">Start camera</button>
+      </div>
+    </div>
+    <div class="tip" id="tip"></div>
+    <div class="flash" id="flash"></div>
+    <div class="controls" aria-label="Camera controls">
+      <button class="ctl" id="btnAuto" type="button" title="Automatically save a photo at the chosen interval">Auto 2m</button>
+      <button class="shutter" id="btnPhoto" type="button" title="Take a photo" aria-label="Take a photo"><i></i></button>
+      <button class="ctl" id="btnClip" type="button" title="Record a five second clip">5 s clip</button>
+    </div>
+  </main>
+
+  <!-- ================= READINGS RAIL (small) ================= -->
+  <aside class="rail">
+    <section class="panel" id="pRead"><h4>AI reading</h4><div class="rname dim">Waiting for camera...</div></section>
+    <section class="panel" id="pTalk">
+      <h4 data-i="mic"><span>Talk to Fasal Saathi</span></h4>
+      <div class="talkrow">
+        <select class="input" id="talkLang" title="Reply language; a spoken request for another language overrides this" aria-label="Reply language"><option value="hi">हिन्दी</option><option value="bho">भोजपुरी</option><option value="mai">मैथिली</option><option value="en">English</option></select>
+        <button class="btn sm primary" id="btnTalk" data-i="mic"><span>Talk</span></button>
+      </div>
+      <div class="rsub" id="talkHeard" style="margin-top:8px"></div>
+      <div class="rsub" id="talkReply" style="color:var(--text-2)"></div>
+    </section>
+    <section class="panel" id="pIntro">
+      <h4>Project introduction</h4>
+      <button class="btn sm primary" id="btnIntro" type="button">हिंदी में परिचय सुनें</button>
+      <div class="rsub" id="introStatus" style="margin-top:7px"></div>
+      <div class="rsub intro-copy" id="introText"></div>
+    </section>
+    <section class="panel" id="pSoil"><h4 data-i="drop"><span>Soil moisture</span></h4><div class="rname dim">No sensor data</div></section>
+
+    <section class="panel" id="pLink">
+      <h4>Rover link (Arduino)</h4>
+      <div class="rname" id="linkTxt">Not connected</div>
+      <div class="rsub" id="linkSub">Plug the Arduino into the tablet with the OTG cable.</div>
+      <div class="rsub" id="sensLine" style="color:var(--text-2);margin-top:4px"></div>
+      <button class="btn sm primary" id="btnUsb" style="margin-top:8px">Connect Arduino</button>
+    </section>
+
+    <section class="panel" id="pGps">
+      <h4>Location</h4>
+      <div class="rname" id="gpsTxt">Waiting for GPS...</div>
+      <div class="rsub" id="gpsSub"></div>
+      <div class="rsub" id="gpsPerm"></div>
+      <button class="btn sm primary" id="btnGps" style="margin-top:8px">Allow location</button>
+    </section>
+
+    <section class="panel" id="pLast"><h4>Last capture</h4><div class="rsub" id="result">No photo taken yet. The laptop controls the camera.</div></section>
+
+    <section class="panel sync">
+      <div class="syncrow"><span>Saved on tablet <b id="total">0</b></span><span>Waiting to send <b id="pend">0</b></span></div>
+      <button class="btn sm" id="btnSend">Send now</button>
+    </section>
+    <div class="rsub offline-note">Offline mode: Auto saves photos on this tablet. Analysis and upload resume when the laptop reconnects. Keep this page open.</div>
+
+    <details class="panel set">
+      <summary>Settings and manual controls</summary>
+      <div class="setbody">
+        <label class="fld">Auto-capture interval in seconds<input class="input" id="autoSeconds" type="number" min="15" max="3600" step="15" value="120"></label>
+        <label class="fld">Camera
+          <select class="input" id="facing"><option value="user" selected>Front camera</option><option value="environment">Back camera</option></select></label>
+        <label class="fld">Laptop address for Wi-Fi (optional)<input class="input" id="alt" placeholder="http://192.168.x.x:8000"></label>
+        <label class="switch"><input type="checkbox" id="showlocal" checked> Show camera picture on this screen</label>
+        <label class="switch"><input type="checkbox" id="preview" checked> Stream live preview to the laptop</label>
+        <label class="switch"><input type="checkbox" id="autosync" checked> Auto-send when connected</label>
+        <label class="switch"><input type="checkbox" id="speakres" checked> Speak result after a photo</label>
+        <div class="btnrow"><button class="btn sm" id="btnStop">Stop camera</button><button class="btn sm danger" id="btnClear">Delete sent items</button></div>
+        <div class="log" id="log"></div>
+      </div>
+    </details>
+  </aside>
+</div>
+<canvas id="pc" hidden></canvas>
+<script src="/js/common.js?v=20261103e"></script>
+<script src="/js/usbserial.js?v=20261103b"></script>
+<script src="/js/voicecap.js?v=20261103b"></script>
+<script src="/js/tablet.js?v=20261103e"></script>
+</body>
+</html>

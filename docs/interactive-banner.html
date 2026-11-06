@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101513">
+<meta name="description" content="AgriSahayak crop-screening rover, laptop dashboard, tablet camera, and farmer support prototype.">
+<title>AgriSahayak — Interactive project banner</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px; color: #e6eee9; background: #101513; font-family: Segoe UI, Arial, sans-serif; }
+  main { width: min(1120px, 100%); }
+  .frame { overflow: hidden; border: 1px solid #385247; border-radius: 18px; box-shadow: 0 28px 90px #0008; background: #101513; }
+  svg { display: block; width: 100%; height: auto; }
+  .hint { margin: 14px 4px 0; color: #a8b8af; font-size: 14px; text-align: center; }
+  @media (prefers-reduced-motion: reduce) { .hint::after { content: ' Motion is reduced by your system setting.'; } }
+</style>
+</head>
+<body>
+<main>
+  <div class="frame" aria-label="Interactive AgriSahayak banner. Move your pointer over the banner to move the gray field line.">
+    <svg id="banner" viewBox="0 0 1400 360" role="img" aria-labelledby="title desc">
+      <title id="title">AgriSahayak — Smart Crop Assistant</title>
+      <desc id="desc">Move the pointer to shift the gray field line below the project title.</desc>
+      <defs>
+        <linearGradient id="field" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#e8eee9"/><stop offset=".52" stop-color="#c9d8ce"/><stop offset="1" stop-color="#a9c4ae"/></linearGradient>
+        <linearGradient id="wave" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#717c78"/><stop offset=".52" stop-color="#475550"/><stop offset="1" stop-color="#727d78"/></linearGradient>
+      </defs>
+      <rect width="1400" height="360" fill="#101513"/>
+      <path d="M40 0H1360V300Q1040 276 700 302T40 300Z" fill="url(#field)"/>
+      <path id="waveBack" d="M40 300Q365 269 700 302T1360 290V327Q1065 349 700 322T40 330Z" fill="url(#wave)"/>
+      <path id="waveFront" d="M40 330Q372 308 700 322T1360 326V360H40Z" fill="#101513"/>
+      <g fill="#18412d" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif">
+        <text x="700" y="132" font-size="62" font-weight="700" letter-spacing="-1.5">AgriSahayak</text>
+        <text x="700" y="177" font-size="22" font-weight="600">SMART CROP ASSISTANT · FIELD ROVER · FARMER SUPPORT</text>
+        <text x="700" y="215" font-size="17" fill="#325d42">Leaf screening  |  Produce detection  |  Offline capture  |  Multilingual guidance</text>
+      </g>
+      <g fill="#3d664b" font-family="Segoe UI,Arial,sans-serif" font-size="13" font-weight="600" letter-spacing="2">
+        <text x="74" y="282">FIELD INTELLIGENCE</text><text x="1326" y="282" text-anchor="end">LAPTOP + TABLET</text>
+      </g>
+    </svg>
+  </div>
+  <p class="hint">Move your mouse or touch across the banner to shift the gray field line.</p>
+</main>
+<script>
+(() => {
+  const svg = document.querySelector('#banner');
+  const back = document.querySelector('#waveBack');
+  const front = document.querySelector('#waveFront');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const baseBack = [300,269,302,290,327,349,322,330];
+  const baseFront = [330,308,322,326];
+  let frame = 0;
+  function draw(event) {
+    if (reduced) return;
+    const box = svg.getBoundingClientRect();
+    const x = Math.max(0, Math.min(1, (event.clientX - box.left) / box.width));
+    const y = Math.max(-1, Math.min(1, ((event.clientY - box.top) / box.height - .5) * 2));
+    const offset = y * 13;
+    const bend = (x - .5) * 20;
+    cancelAnimationFrame(frame);
+    frame = requestAnimationFrame(() => {
+      back.setAttribute('d', `M40 ${baseBack[0]+offset*.45} Q${365+x*150} ${baseBack[1]-bend} 700 ${baseBack[2]+offset} T1360 ${baseBack[3]+bend*.3} V${baseBack[4]+offset*.4} Q1065 ${baseBack[5]+bend} 700 ${baseBack[6]+offset*.35} T40 ${baseBack[7]+offset*.4}Z`);
+      front.setAttribute('d', `M40 ${baseFront[0]+offset*.4} Q372 ${baseFront[1]+bend} 700 ${baseFront[2]+offset*.35} T1360 ${baseFront[3]+offset*.4}V360H40Z`);
+    });
+  }
+  function reset() {
+    back.setAttribute('d', 'M40 300Q365 269 700 302T1360 290V327Q1065 349 700 322T40 330Z');
+    front.setAttribute('d', 'M40 330Q372 308 700 322T1360 326V360H40Z');
+  }
+  svg.addEventListener('pointermove', draw);
+  svg.addEventListener('pointerleave', reset);
+  svg.addEventListener('pointercancel', reset);
+})();
+</script>
+</body>
+</html>

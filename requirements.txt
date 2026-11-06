@@ -1,0 +1,10 @@
+Flask>=3.1,<4
+Pillow>=10,<13
+numpy>=1.26,<3
+transformers>=5.0,<6
+huggingface_hub>=0.30,<2
+safetensors>=0.4,<1
+pyserial>=3.5,<4
+soundfile>=0.12,<1
+sentencepiece>=0.2,<1
+librosa>=0.10,<1
