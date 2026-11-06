@@ -9,7 +9,7 @@ Leaf screening · produce detection · offline photo capture · multilingual far
 
 ![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)
 ![MobileNetV2](https://img.shields.io/badge/Leaf%20classifier-MobileNetV2-3973A5)
-![CLIP ViT-B/32](https://img.shields.io/badge/Leaf%20gate-CLIP%20ViT--B%2F32-7D56A5)
+![AgriSahayak gate powered by OpenAI CLIP](https://img.shields.io/badge/AgriSahayak%20scene%20gate-OpenAI%20CLIP%20ViT--B%2F32-7D56A5)
 ![RT-DETR](https://img.shields.io/badge/Produce%20detector-RT--DETR-168B62)
 ![38 leaf labels](https://img.shields.io/badge/Leaf%20labels-38-3973A5)
 ![12 produce classes](https://img.shields.io/badge/Produce%20classes-12-168B62)
@@ -31,7 +31,7 @@ The laptop runs image analysis with **PyTorch and Hugging Face Transformers**, u
 | Model | Role | Outputs | Runtime / availability |
 |---|---|---|---|
 | **MobileNetV2** — `linkanjarad/mobilenet_v2_1.0_224-plant-disease-identification` | Leaf health/disease classifier | **38** crop-and-condition labels (see crop table) | PyTorch + Transformers; download weights with `python download_models.py` |
-| **CLIP ViT-B/32** — `openai/clip-vit-base-patch32` | Zero-shot leaf-versus-other-scene gate before leaf classification; not a disease classifier | Similarity scores for text prompts; no fixed disease classes | PyTorch + Transformers; downloaded by `python download_models.py` |
+| **AgriSahayak Leaf/Scene Gate**, powered by official OpenAI **CLIP ViT-B/32** — `openai/clip-vit-base-patch32` | Project-specific prompt and threshold logic compares leaf and non-leaf scene descriptions before leaf classification; it is not a disease classifier | Text-image similarity scores; no fixed disease classes | PyTorch + Transformers; the OpenAI checkpoint is downloaded by `python download_models.py` |
 | **RT-DETR v1, Objects365** — `MohamedKhayat/fruit-detector-rtdetrv1-50-obj365` | Produce object detection | **12** named produce classes, boxes, and approximate counts | PyTorch + Transformers; downloaded by `python download_models.py` |
 | **Optional tomato fruit screen** — fine-tuned MobileNetV2 | Extra tomato photo screening, separate from leaf disease classification | Two broad labels: healthy-looking / possible issue; uncertain below threshold | Training code is included; dataset and trained weights are not. It evaluates a combined tomato region, not each fruit or a named disease. |
 
@@ -96,7 +96,7 @@ The [dashboard design review](docs/DASHBOARD_DESIGN_REVIEW.md) includes the Live
 | Field dashboard | Live camera view, analysis, readings, recent records, CSV export and rover controls | Laptop browser |
 | Tablet camera | Camera preview, manual/automatic capture, local queue, reconnect sync, full-screen view and language controls | Tablet browser |
 | MobileNetV2 leaf classifier | Predicts one of its 38 supported leaf condition labels | Laptop CPU or NVIDIA GPU |
-| CLIP ViT-B/32 gate | Zero-shot leaf/scene similarity check before leaf classification | Laptop CPU or NVIDIA GPU |
+| AgriSahayak Leaf/Scene Gate (OpenAI CLIP ViT-B/32) | Project-specific zero-shot prompt gate before leaf classification | Laptop CPU or NVIDIA GPU |
 | RT-DETR produce detector | Detects and draws boxes/counts for 12 supported produce classes | Laptop CPU or NVIDIA GPU |
 | Tomato fruit screen | Optional binary “healthy-looking / possible issue” screen for a tomato image region | Laptop CPU or NVIDIA GPU |
 | Fasal Saathi | Concise farm Q&A using local Ollama first, optional Groq/xAI fallback, and fixed safe responses | Laptop |
